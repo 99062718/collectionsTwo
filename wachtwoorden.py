@@ -1,10 +1,9 @@
 import random
 
-kleineLetter = "a b c d e f g h i j k l m n o p q r s t u v w x y z"
-groteLetter = kleineLetter.upper().split(" ")
-kleineLetter = kleineLetter.split(" ")
-cijfers = "0 1 2 3 4 5 6 7 8 9".split(" ")
-speciale = "@ # $ % & _ ?".split(" ")
+kleineLetter = "abcdefghijklmnopqrstuvwxyz"
+groteLetter = kleineLetter.upper()
+cijfers = "0123456789"
+speciale = "@#$%&_?"
 aantalGrote = random.randint(2, 6)
 aantalCijfer = random.randint(4, 7)
 characters = [[], [], [], []]
