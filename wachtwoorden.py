@@ -25,7 +25,7 @@ def wachtwoordMaker():
     global wachtwoord
     global characters
     randomNum = random.randint(0, len(characters) - 1)
-    if randomNum == 2 and len(wachtwoord) < 3 or randomNum == 3 and len(wachtwoord) == 0 or randomNum == 3 and len(wachtwoord) == 23:
+    if randomNum == 2 and len(wachtwoord) < 3 or randomNum == 1 and len(wachtwoord) == 0 or randomNum == 1 and len(wachtwoord) == 23:
         wachtwoordMaker()
     else:
         wachtwoord += characters[randomNum][0]
