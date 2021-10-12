@@ -10,12 +10,12 @@ possibleScores = {
     "extra bonus": 35
 }
 
-def roll(stenen=[0,1,2,3,4]):
+def roll(stenen=[0,1,2,3,4]): #rolls the given dices
     global dobbelstenen
     for x in stenen:
         dobbelstenen[x] = random.randint(1, 6)
 
-def reRoll():
+def reRoll(): #lets the players choose which dices they would like to roll again
     global dobbelstenen
     list = []
     opnieuw = input("Welke dobbelstenen wilt u opnieuw gooien (schrijf als '12345')?\n")
@@ -23,7 +23,7 @@ def reRoll():
         list.append(int(opnieuw[x]) - 1)
     roll(list)
 
-def straight(message, number, beurt):
+def straight(message, number, beurt): #calculate if a straight is correct or not once chosen
     begin = int(input("Welke dobbelsteen begint de straight?\n"))
     oldDobbelsteen = 0
     lowestDobbelsteen = dobbelstenen[begin - 1]
@@ -41,7 +41,7 @@ def straight(message, number, beurt):
         print(message)
         keuze(beurt)
 
-def keuze(beurt):
+def keuze(beurt): #lets the player choose between the given choices
     global totaalTop
     global totaal
     global dobbelstenen
@@ -119,7 +119,7 @@ def keuze(beurt):
             print("Dit is geen geldige optie!")
             keuze(beurt)
 
-def beurt(beurt):
+def beurt(beurt): #starts a players turn
     roll()
     print("Uw dobbelstenen zijn: " + str(dobbelstenen))
     choice = "y"
@@ -132,12 +132,14 @@ def beurt(beurt):
             print("Uw dobbelstenen zijn: " + str(dobbelstenen))
     keuze(beurt)
 
-def tussenstand(message):
+def tussenstand(message): #calculates the current points of every player
     tussenstand = []
     for y in range(0, len(totaal)):
         tussenstandTop = totaalTop[y] if totaalTop[y] < 63 else totaalTop[y] + 35
-        tussenstand = totaal[y] + totaalTop[y]
+        tussenstand.append(totaal[y] + tussenstandTop)
     print(message + str(tussenstand))
+
+#--------------------------------game innitiates here------------------------------------------
 
 aantalPlayers = int(input("Met hoeveel spelers wilt u het spel spelen?\n"))
 game = 0
