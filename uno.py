@@ -74,20 +74,35 @@ while programEnd != "ja":
             for number in range(8):
                 getCard(naam)
 
+    reverse = False
+    pastCard = ["special", None]
     while gameEnd != "ja": #start of the game
-        increment = 1
-        startNumber = 0
-        endNumber = len(playerKaarten) - 1
+        increment = 1 if reverse == False else -1
+        startNumber = 0 if reverse == False else len(playerKaarten) - 1
+        endNumber = len(playerKaarten) - 1 if reverse == False else -1
         for number in range(startNumber, endNumber, increment):
             naam = players[number]
+            naamNext = players[number - increment]
 
-            if card == "plus 4":
-                for x in range(4):
-                    getCard(naam + increment)
-            elif card == "plus 2":
-                for x in range(2):
-                    getCard(naam + increment)
-            elif card == "skip":
-                number += increment
-            elif card == "choice":
-                pass
+            card = [max(playerKaarten[naam])]
+            if card[0] == "special":
+                card.append(playerKaarten[naam]["special"][random.rantint(0, len(playerKaarten[naam]["special"]))])
+                playerKaarten[naam]["special"].remove(card[1])
+                if card[1] == "plus 4":
+                    for x in range(4):
+                        getCard(naamNext)
+                elif card[1] == "choice":
+                    pastCard = [max(playerKaarten[naam]), None] if max(playerKaarten[naam]) != "special" else [kleuren[random.randint(0,3)], None]
+            else: #continue working here
+                card.append
+                if pastCard[0] == "special" or pastCard[0] == card[0]:                   
+                    if card[1] == "plus 2":
+                        for x in range(2):
+                            getCard(naamNext)
+                    elif card[1] == "skip":
+                        number += increment
+                        number = startNumber if number == -1 or number == len(playerKaarten) else number
+                    elif card[1] == "reverse":
+                        reverse = True if reverse == False else False
+                        increment = 1 if reverse == False else -1
+                        endNumber = len(playerKaarten) - 1 if reverse == False else -1
