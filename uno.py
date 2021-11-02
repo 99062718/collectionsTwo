@@ -1,4 +1,5 @@
 import random
+import time
 
 players = []
 playerKaarten = {}
@@ -24,15 +25,14 @@ def refreshCards(): #once cards have run out we can call this function to refres
                 totaalKaarten[kleur].append("turn")
                 totaalKaarten[kleur].append("plus 2")
             for x in range(19):
-                totaalKaarten[kleur].append(random.randint(0, 9))
+                totaalKaarten[kleur].append(str(random.randint(0, 9)))
         else:
             for x in range(4): #fills up special key inside totaalKaarten dict. The reason this is seperate from the other colors inside the dict is because this one has its own unique cards and amount
                 totaalKaarten[kleur].append("plus 4")
                 totaalKaarten[kleur].append("choice")
 
 def emptyStackCheck(): #checks of the stack cards need to be grabbed from is empty. If it is it gets refreshed
-    totaal = len(totaalKaarten["blue"]) + len(totaalKaarten["green"]) + len(totaalKaarten["red"]) + len(totaalKaarten["yellow"]) + len(totaalKaarten["special"])
-    if totaal == 0:
+    if len(totaalKaarten["blue"]) + len(totaalKaarten["green"]) + len(totaalKaarten["red"]) + len(totaalKaarten["yellow"]) + len(totaalKaarten["special"]) == 0:
         refreshCards()
 
 def getCard(naam): #gives player a card
@@ -43,10 +43,39 @@ def getCard(naam): #gives player a card
         kleur = kleuren[random.randint(0, len(kleuren) - 1)]
         if len(totaalKaarten[kleur]) == 0:
             continue
-        number = random.randint(0, len(totaalKaarten[kleur]) - 1)
-        playerKaarten[naam][kleur].append(totaalKaarten[kleur][number])
-        del totaalKaarten[kleur][number]
+        numberLocal = random.randint(0, len(totaalKaarten[kleur]) - 1)
+        playerKaarten[naam][kleur].append(totaalKaarten[kleur][numberLocal])
+        del totaalKaarten[kleur][numberLocal]
         break
+
+def cardFunctions(card):
+    global startNumber
+    global increment
+    global endNumber
+    global reverse
+    global number
+    if card == "plus 2":
+        for x in range(2):
+            getCard(naamNext)
+        print("{} has to take 2 cards!".format(naamNext))
+    elif card == "turn":
+        reverse == True if reverse == False else False
+        increment = 1 if reverse == False else -1
+        startNumber = 0 if reverse == False else len(playerKaarten) - 1
+        endNumber = len(playerKaarten) if reverse == False else -1
+    elif card == "skip":
+        number = number - increment if number - increment != -1 and number - increment != len(playerKaarten) else players[startNumber]
+
+def findBiggest(naam):
+    biggestColor = ["", 0]
+    colors = list(playerKaarten[naam].keys())
+    for numberLocal in range(0, 5):
+        if len(playerKaarten[naam][colors[numberLocal]]) > biggestColor[1]:
+            biggestColor[0] = colors[numberLocal]
+            biggestColor[1] = len(playerKaarten[naam][colors[numberLocal]])
+    return biggestColor[0]
+
+
 
 aantalPlayers = int(input("Hoeveel spelers?\n")) #asks user for amount of players and their names
 for player in range(1, aantalPlayers + 1):
@@ -79,30 +108,70 @@ while programEnd != "ja":
     while gameEnd != "ja": #start of the game
         increment = 1 if reverse == False else -1
         startNumber = 0 if reverse == False else len(playerKaarten) - 1
-        endNumber = len(playerKaarten) - 1 if reverse == False else -1
+        endNumber = len(playerKaarten) if reverse == False else -1
         for number in range(startNumber, endNumber, increment):
+            print(playerKaarten)
             naam = players[number]
-            naamNext = players[number - increment]
+            naamNext = players[number - increment] if number - increment != -1 and number - increment != len(playerKaarten) else players[startNumber]
+            currentCard = [findBiggest(naam)]
+            if currentCard[0] == pastCard[0] or currentCard[0] == "special" or pastCard[0] == "special":
+                if currentCard[0] == "special":
+                    currentCard.append(playerKaarten[naam]["special"][0])
+                    print("{} plays {}".format(naam, currentCard))
 
-            card = [max(playerKaarten[naam])]
-            if card[0] == "special":
-                card.append(playerKaarten[naam]["special"][random.rantint(0, len(playerKaarten[naam]["special"]))])
-                playerKaarten[naam]["special"].remove(card[1])
-                if card[1] == "plus 4":
-                    for x in range(4):
-                        getCard(naamNext)
-                elif card[1] == "choice":
-                    pastCard = [max(playerKaarten[naam]), None] if max(playerKaarten[naam]) != "special" else [kleuren[random.randint(0,3)], None]
-            else: #continue working here
-                card.append
-                if pastCard[0] == "special" or pastCard[0] == card[0]:                   
-                    if card[1] == "plus 2":
-                        for x in range(2):
+                    if currentCard[1] == "plus 4":
+                        for x in range(4):
                             getCard(naamNext)
-                    elif card[1] == "skip":
-                        number += increment
-                        number = startNumber if number == -1 or number == len(playerKaarten) else number
-                    elif card[1] == "reverse":
-                        reverse = True if reverse == False else False
-                        increment = 1 if reverse == False else -1
-                        endNumber = len(playerKaarten) - 1 if reverse == False else -1
+                        print("{} has to take 4 cards!".format(naamNext))
+
+                    playerKaarten[naam]["special"].remove(playerKaarten[naam]["special"][0])   
+                    pastCard = ["special", None] if currentCard[1] != "choice" else [findBiggest(naam), None]
+                else:
+                    pastCard = []
+                    pastCard.append(currentCard[0])
+                    pastCard.append(max(playerKaarten[naam][currentCard[0]]))
+                    print("{} plays {}".format(naam, pastCard))
+                    cardFunctions(pastCard[1])
+                    playerKaarten[naam][currentCard[0]].remove(max(playerKaarten[naam][currentCard[0]]))
+            else:
+                if len(playerKaarten[naam][pastCard[0]]) > 0:
+                    pastCard = [pastCard[0]]
+                    pastCard.append(max(playerKaarten[naam][pastCard[0]]))
+                    print("{} plays {}".format(naam, pastCard))
+                    cardFunctions(pastCard[1])
+                    playerKaarten[naam][currentCard[0]].remove(max(playerKaarten[naam][currentCard[0]]))
+                else:
+                    colorKey = []
+                    for color in playerKaarten[naam]:
+                        for card in color:
+                            if card == pastCard[1]:
+                                colorKey = list(playerKaarten[naam].keys())[list(playerKaarten[naam].values()).index(card)]
+                                pastCard = [colorKey, card]
+                                playerKaarten[naam][color].remove(card)
+                                break
+                        if colorKey != []:
+                            break
+                    if colorKey == []:
+                        getCard(naam)
+                        print("{} could not play anything and has to grab a card!".format(naam))
+
+            if len(playerKaarten[naam]["blue"]) + len(playerKaarten[naam]["red"]) + len(playerKaarten[naam]["green"]) + len(playerKaarten[naam]["yellow"]) + len(playerKaarten[naam]["special"]) == 0:
+                    print("{} has UNO!".format(naam))
+                    gameEnd = "ja"
+                    playerPunten[naam] += 100
+                    break
+
+            time.sleep(2)
+    
+    for number in range(0, len(playerPunten)):
+        namen = list(playerPunten.keys())
+        if playerPunten[namen[number]] >= 500:
+            print("{} has won the game!".format(namen[number]))
+            programEnd = "ja"
+            break
+                                
+                        
+
+
+
+            
